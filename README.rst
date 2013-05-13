@@ -15,6 +15,6 @@ does not require interactive conflict resolution, ``git squash`` can also set
 the commit message.
 
 Requirements: ``bash``, ``awk``, ``grep`` with PCRE support, and of course
-``git``, and a set ``EDITOR`` environment variable.
+``git`` >= 1.7.8, and a set ``EDITOR`` environment variable.
 
 Installation: copy the git-squash file to a directory on your ``PATH`` and ``chmod +x``.

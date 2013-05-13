@@ -47,36 +47,27 @@ then
 	usage
 fi
 
-ed_dir=$(mktemp -d -t squash_ed) &&
-ed_path="$ed_dir/squash_ed" &&
-normal_ed="$EDITOR" &&
+seq_ed="$(mktemp -t squash_ed)" &&
 echo '#!'$(which bash)'
-has_message='$([ -n "$message" ] && echo 1)'
-
-if grep -q "^# Rebase .* onto " "$1"
-then
 	echo Squashing... >&2
 	tmp="$(mktemp -t squash_out)"
 	awk '"'"'NR != 1 { sub(/^pick/, "squash") } {print}'"'"' "$1" > "$tmp"
 	mv "$tmp" "$1"
-elif [ -n "$has_message" ] && head -n1 "$1" | grep -q "^# This is a combination of"
-then
-	echo "[Temporary commit message]" > "$1"
-else
-	echo Launching '$normal_ed'... >&2
-	"'$normal_ed'" "$1"
-	exit $?
-fi
-' > $ed_path &&
-chmod +x $ed_path &&
+' > $seq_ed &&
+chmod +x "$seq_ed" &&
 
 echo 'Warning: Forgetting local history. To revert, use:
   $ git reset --hard' $(git rev-parse --short HEAD) >&2
-EDITOR=$ed_path git rebase -i $base &&
 if [ -n "$message" ]
 then
-	# in case of only one commit, still fix message
+	GIT_SEQUENCE_EDITOR=$seq_ed GIT_EDITOR=touch git rebase -i $base
+else
+	GIT_SEQUENCE_EDITOR=$seq_ed git rebase -i $base
+fi
+if [ -n "$message" ]
+then
+	echo 'Updating commit message' >&2
 	git commit --amend -m "$message" | head -n1
 fi
-rm -r $ed_dir
+rm -r "$seq_ed"
 
