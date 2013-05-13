@@ -1,4 +1,5 @@
 #!/bin/bash
+# Author: Joel Nothman
 
 usage() {
 	echo Usage: $0 '[-m <commit msg>] <base>'
