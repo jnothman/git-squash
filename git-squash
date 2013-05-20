@@ -47,10 +47,10 @@ then
 	usage
 fi
 
-seq_ed="$(mktemp -t squash_ed)" &&
+seq_ed="$(mktemp -t squash_edXXXXXX)" &&
 echo '#!'$(which bash)'
 	echo Squashing... >&2
-	tmp="$(mktemp -t squash_out)"
+	tmp="$(mktemp -t squash_outXXXXXX)"
 	awk '"'"'NR != 1 { sub(/^pick/, "squash") } {print}'"'"' "$1" > "$tmp"
 	mv "$tmp" "$1"
 ' > $seq_ed &&
